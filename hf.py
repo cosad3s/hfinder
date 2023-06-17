@@ -22,21 +22,57 @@ def main():
     parser = argparse.ArgumentParser(description='Find hostnames from ASN or CIDR - Robtex x BGP.HE')
     parser.add_argument('-c', type=str, required=False, dest='cidr', help = "CIDR (Ex: 192.168.0.0/24)")
     parser.add_argument('-a', type=str, required=False, dest='asn', help = "ASN (Ex: AS1234)")
+    parser.add_argument('--hosts', action="store_true", default=False, dest='hosts', help = "Generate /etc/hosts like file")
+    parser.add_argument('--fqdn', action="store_true", default=False, dest='fqdn', help = "Only display found FQDN")
     args = parser.parse_args()
-    hostnames = set()
+
+    # By default : for each value of the list, the key is FQDN and values are IPs
+    final_findings = {}
     if (args.cidr):
         validate_cidr(args.cidr)
-        hostnames.update(search_cidr(args.cidr))
+        final_findings = search_cidr(args.cidr)
     elif (args.asn):
         validate_asn(args.asn)
         ranges = search_asn(args.asn)
         for r in ranges:
-            hostnames.update(search_cidr(r))
+            fresh_findings = search_cidr(r)
+            for fresh_finding_fqdn in fresh_findings.keys():
+                actual_findings_ips = final_findings.get(fresh_finding_fqdn)
+                if actual_findings_ips is None:
+                    actual_findings_ips = fresh_findings.get(fresh_finding_fqdn)
+                else:
+                    actual_findings_ips.update(fresh_findings.get(fresh_finding_fqdn))
+                final_findings.update({fresh_finding_fqdn:actual_findings_ips})
+
             time.sleep(1)
     else:
         fail()
-    for h in hostnames:
-        print(h)
+    
+    # Reverse dictionnary to display as hosts file
+    if args.hosts:
+        result = {}
+        index = 0;
+
+        for ips in final_findings.values():
+            for i in ips:
+                fqdn_list = list(final_findings)[index]
+                current_fqdn_list = result.get(i)
+                if current_fqdn_list is None:
+                    current_fqdn_list = set([fqdn_list])
+                else:
+                    current_fqdn_list.update([fqdn_list])
+                result.update({i:current_fqdn_list})
+            index = index + 1
+        # Display as /etc/hosts file
+        for item in result.keys():
+            print(item + " " + " ".join(result.get(item)))
+    else:
+        if args.fqdn:
+            for h in final_findings.keys():
+                print(h)
+        else:
+            for h in final_findings.keys():
+                print(h + ":" + " ".join(final_findings.get(h)))
     
 def validate_cidr(cidr):
     cidr_regex = "\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:/\d{1,2}|)"
@@ -90,11 +126,23 @@ def search_cidr(cidr):
     soup = BeautifulSoup(response.text, 'html.parser')
     
     links = soup.find_all("a", href=True)
-    filtered_links = [link["href"] for link in links if link["href"].startswith("https://www.robtex.com/dns-lookup/")]
+    filtered_ip_links = [link["href"] for link in links if link["href"].startswith("https://www.robtex.com/ip-lookup/")]
+    filtered_named_links = [link["href"] for link in links if link["href"].startswith("https://www.robtex.com/dns-lookup/")]
 
-    hostnames = []
-    for link in filtered_links:    
-        hostnames.append((link.replace("https://www.robtex.com/dns-lookup/","")))
+    hostnames = {}
+    index = 0;
+    for link in filtered_named_links:
+        h = link.replace("https://www.robtex.com/dns-lookup/","")
+        ip = filtered_ip_links[index].replace("https://www.robtex.com/ip-lookup/","")
+        
+        actual_findings = hostnames.get(h)
+        if actual_findings is not None:
+            actual_findings.update([ip])
+        else:
+            actual_findings = set([ip])
+        hostnames.update({h:actual_findings})
+        
+        index = index + 1;
     
     return hostnames
 

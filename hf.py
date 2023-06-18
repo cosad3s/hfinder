@@ -46,7 +46,7 @@ def main():
 
             time.sleep(1)
     else:
-        fail()
+        fail("Invalid given parameters. Should select -c or -a.")
     
     # Reverse dictionnary to display as hosts file
     if args.hosts:
@@ -78,13 +78,13 @@ def validate_cidr(cidr):
     cidr_regex = "\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?:/\d{1,2}|)"
     m = re.search(cidr_regex,cidr)
     if not m:
-        fail()
+        fail("Invalid CIDR: "+cidr)
 
 def validate_asn(asn):
     asn_regex = "^AS\d+$"
     m = re.search(asn_regex,asn)
     if not m:
-        fail()
+        fail("Invalid ASN: "+asn)
 
 def search_asn(asn):
     bgphe_url = "https://bgp.he.net/"
@@ -121,7 +121,7 @@ def search_cidr(cidr):
     session = requests.Session()
     response = session.get(str(robtex_url)+uri, verify=False)
     if (response.status_code != 200):
-        fail()
+        fail("Robtex invalid HTTP response: "+response.status_code)
     
     soup = BeautifulSoup(response.text, 'html.parser')
     
@@ -146,8 +146,8 @@ def search_cidr(cidr):
     
     return hostnames
 
-def fail():
-    print("[-] Error with given parameters")
+def fail(msg):
+    print("[-] Error: "+msg)
     sys.exit()
 
 if __name__ == '__main__':

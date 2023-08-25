@@ -24,8 +24,16 @@ def main():
     parser.add_argument('-a', type=str, required=False, dest='asn', help = "ASN (Ex: AS1234)")
     parser.add_argument('--hosts', action="store_true", default=False, dest='hosts', help = "Generate /etc/hosts like file")
     parser.add_argument('--fqdn', action="store_true", default=False, dest='fqdn', help = "Only display found FQDN")
+    parser.add_argument('--filter', type=str, required=False, dest='filter', help = "Filter FQDN against regex (Ex: ^.*example\.org$)")
     args = parser.parse_args()
 
+    # Validate the filter before launching any search activities
+    if args.filter:
+        try:
+            filter = re.compile(args.filter)
+        except re.error:
+            fail("Invalid filter: not a regex filter")
+    
     # By default : for each value of the list, the key is FQDN and values are IPs
     final_findings = {}
     if (args.cidr):
@@ -48,6 +56,11 @@ def main():
     else:
         fail("Invalid given parameters. Should select -c or -a.")
     
+    # Filter before display
+    if filter:
+        filtered_final_findings = {key: value for key, value in final_findings.items() if re.match(args.filter, key)}
+        final_findings = filtered_final_findings
+
     # Reverse dictionnary to display as hosts file
     if args.hosts:
         result = {}

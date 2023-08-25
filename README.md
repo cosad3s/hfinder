@@ -12,17 +12,18 @@ pip install -r requirements
 ```
 
 ```bash
-❯ python3 hf.py -h
-usage: hf.py [-h] [-c CIDR] [-a ASN] [--hosts] [--fqdn]
+❯ python3 ./hf.py -h
+usage: hf.py [-h] [-c CIDR] [-a ASN] [--hosts] [--fqdn] [--filter FILTER]
 
 Find hostnames from ASN or CIDR - Robtex x BGP.HE
 
 options:
-  -h, --help  show this help message and exit
-  -c CIDR     CIDR (Ex: 192.168.0.0/24)
-  -a ASN      ASN (Ex: AS1234)
-  --hosts     Generate /etc/hosts like file
-  --fqdn      Only display found FQDN
+  -h, --help       show this help message and exit
+  -c CIDR          CIDR (Ex: 192.168.0.0/24)
+  -a ASN           ASN (Ex: AS1234)
+  --hosts          Generate /etc/hosts like file
+  --fqdn           Only display found FQDN
+  --filter FILTER  Filter FQDN against regex (Ex: ^.*example\.org$)
 ```
 
 Examples:
@@ -84,6 +85,14 @@ vpn-west.uberatc.com:207.231.171.36
 207.231.169.199 prj.usuppliers.uber.com
 207.231.169.200 usuppliers.uber.com
 207.231.171.36 vpn-west.uberatc.com
+```
+
+```bash
+❯ python3 ./hf.py -a AS26673 --hosts --filter "^.*uber.com$"
+207.231.168.151 backup.uber.com
+207.231.168.160 team.uber.com
+207.231.169.199 prj.usuppliers.uber.com
+207.231.169.200 usuppliers.uber.com
 ```
 
 ```bash

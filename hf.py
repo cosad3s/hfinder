@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import argparse
@@ -28,6 +28,7 @@ def main():
     args = parser.parse_args()
 
     # Validate the filter before launching any search activities
+    filter=""
     if args.filter:
         try:
             filter = re.compile(args.filter)

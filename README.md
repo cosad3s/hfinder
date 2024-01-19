@@ -7,6 +7,8 @@ Can generate /etc/hosts file based on the results.
 
 ## Usage
 
+*You should have ~~Chromium~~ ([https://github.com/SergeyPirogov/webdriver_manager/issues/649](https://github.com/SergeyPirogov/webdriver_manager/issues/649)) or* ***Google Chrome*** *pre-installed on your system.*
+
 ```bash
 pip install -r requirements
 ```

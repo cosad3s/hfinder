@@ -135,7 +135,7 @@ def search_cidr(cidr):
     session = requests.Session()
     response = session.get(str(robtex_url)+uri, verify=False)
     if (response.status_code != 200):
-        fail("Robtex invalid HTTP response: "+response.status_code)
+        fail("Robtex invalid HTTP response: "+str(response.status_code))
     
     soup = BeautifulSoup(response.text, 'html.parser')
     

@@ -41,7 +41,7 @@ def main():
         cidrs = args.cidr.split(",")
         for cidr in cidrs:
             validate_cidr(cidr)
-            final_findings = search_cidr(cidr)
+            final_findings.update(search_cidr(cidr))
     elif (args.asn):
         asns = args.asn.split(",")
         for asn in asns:

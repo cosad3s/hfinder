@@ -20,8 +20,8 @@ requests.packages.urllib3.disable_warnings()
 
 def main():
     parser = argparse.ArgumentParser(description='Find hostnames from ASN or CIDR - Robtex x BGP.HE')
-    parser.add_argument('-c', type=str, required=False, dest='cidr', help = "CIDR (Ex: 192.168.0.0/24)")
-    parser.add_argument('-a', type=str, required=False, dest='asn', help = "ASN (Ex: AS1234)")
+    parser.add_argument('-c', type=str, required=False, dest='cidr', help = "CIDR(s) (Single or multiple separated by commas - Ex: 192.168.0.0/24 or 192.168.0.0/24,192.168.1.0/24)")
+    parser.add_argument('-a', type=str, required=False, dest='asn', help = "ASN(s) (Single or multiple separated by commas - Ex: AS1234 or AS1234,AS4561)")
     parser.add_argument('--hosts', action="store_true", default=False, dest='hosts', help = "Generate /etc/hosts like file")
     parser.add_argument('--fqdn', action="store_true", default=False, dest='fqdn', help = "Only display found FQDN")
     parser.add_argument('--filter', type=str, required=False, dest='filter', help = "Filter FQDN against regex (Ex: ^.*example\.org$)")
@@ -38,22 +38,26 @@ def main():
     # By default : for each value of the list, the key is FQDN and values are IPs
     final_findings = {}
     if (args.cidr):
-        validate_cidr(args.cidr)
-        final_findings = search_cidr(args.cidr)
+        cidrs = args.cidr.split(",")
+        for cidr in cidrs:
+            validate_cidr(cidr)
+            final_findings = search_cidr(cidr)
     elif (args.asn):
-        validate_asn(args.asn)
-        ranges = search_asn(args.asn)
-        for r in ranges:
-            fresh_findings = search_cidr(r)
-            for fresh_finding_fqdn in fresh_findings.keys():
-                actual_findings_ips = final_findings.get(fresh_finding_fqdn)
-                if actual_findings_ips is None:
-                    actual_findings_ips = fresh_findings.get(fresh_finding_fqdn)
-                else:
-                    actual_findings_ips.update(fresh_findings.get(fresh_finding_fqdn))
-                final_findings.update({fresh_finding_fqdn:actual_findings_ips})
+        asns = args.asn.split(",")
+        for asn in asns:
+            validate_asn(asn)
+            ranges = search_asn(asn)
+            for r in ranges:
+                fresh_findings = search_cidr(r)
+                for fresh_finding_fqdn in fresh_findings.keys():
+                    actual_findings_ips = final_findings.get(fresh_finding_fqdn)
+                    if actual_findings_ips is None:
+                        actual_findings_ips = fresh_findings.get(fresh_finding_fqdn)
+                    else:
+                        actual_findings_ips.update(fresh_findings.get(fresh_finding_fqdn))
+                    final_findings.update({fresh_finding_fqdn:actual_findings_ips})
 
-            time.sleep(1)
+                time.sleep(1)
     else:
         fail("Invalid given parameters. Should select -c or -a.")
     

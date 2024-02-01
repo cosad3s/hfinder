@@ -109,22 +109,25 @@ def search_asn(asn):
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     driver.get(str(bgphe_url)+uri)
 
+    ranges = []
     try:
         element_present = EC.presence_of_element_located((By.ID, 'table_prefixes4'))
         WebDriverWait(driver, 10).until(element_present)
     except TimeoutException:
-        print("Timed out waiting for page to load")
+        return ranges
     finally:
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         
-        table = soup.find_all(id='table_prefixes4')[0]
-        links = table.find_all("a", href=True)
-        
-        filtered_links = [link["href"] for link in links if link["href"].startswith("/net/")]
-
+        tables = soup.find_all(id='table_prefixes4');
         ranges = []
-        for link in filtered_links:
-            ranges.append(link.replace("/net/",""))
+        if (len(tables) > 0):
+            table = tables[0]
+            links = table.find_all("a", href=True)
+            
+            filtered_links = [link["href"] for link in links if link["href"].startswith("/net/")]
+    
+            for link in filtered_links:
+                ranges.append(link.replace("/net/",""))
         
         return ranges
 

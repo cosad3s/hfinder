@@ -22,7 +22,7 @@ setup(
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     packages=find_packages(),
-    install_requires=["beautifulsoup4","requests","argparse","webdriver-manager"],
+    install_requires=["selenium", "beautifulsoup4","requests","argparse","webdriver-manager"],
     url="https://github.com/cosad3s/hfinder",
     keywords=['hostnames', 'cidr', 'asn', 'network', 'discovery', 'osint', 'bugbounty'],
     entry_points={

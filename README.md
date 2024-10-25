@@ -12,7 +12,7 @@ Can generate filtered /etc/hosts file based on the results.
 
 ## Installation
 
-*You should have ~~Chromium~~ ([https://github.com/SergeyPirogov/webdriver_manager/issues/649](https://github.com/SergeyPirogov/webdriver_manager/issues/649)) or* ***Google Chrome*** *pre-installed on your system.*
+*You should have Chromium Driver ([https://github.com/SergeyPirogov/webdriver_manager/issues/649](https://github.com/SergeyPirogov/webdriver_manager/issues/649)) *pre-installed on your system: `sudo apt install chromium-driver`*
 
 ```bash
 pip install hfinder

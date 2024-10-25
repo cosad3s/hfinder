@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 from os import path
 import io
 
-VERSION = '1.0.2' 
+VERSION = '1.0.3' 
 DESCRIPTION = 'hfinder'
 
 pwd = path.abspath(path.dirname(__file__))

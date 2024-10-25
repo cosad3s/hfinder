@@ -14,7 +14,6 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 
 requests.packages.urllib3.disable_warnings() 
 
@@ -110,7 +109,8 @@ def search_asn(asn):
 
     options = Options()
     options.add_argument("--headless")
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    chromedriver_path = '/usr/bin/chromedriver'
+    driver = webdriver.Chrome(service=Service(chromedriver_path), options=options)
     driver.get(str(bgphe_url)+uri)
 
     ranges = []
